@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique(); // code de la partie
+            $table->foreignId('admin_id')->constrained('users'); // admin
+            $table->enum('status', ['waiting', 'running', 'finished'])->default('waiting');
             $table->timestamps();
         });
     }

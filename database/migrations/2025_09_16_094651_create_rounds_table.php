@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('rounds', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('game_id')->constrained('games')->onDelete('cascade');
+            $table->char('letter', 1); // lettre tirée
+            $table->json('categories'); // catégories tirées
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('ended_at')->nullable();
+            $table->enum('status', ['running', 'finished'])->default('running');
             $table->timestamps();
         });
     }

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('round_id')->constrained('rounds')->onDelete('cascade');
+            $table->foreignId('player_id')->constrained('players')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->string('answer');
+            $table->boolean('is_valid')->nullable(); // validé par l'admin
             $table->timestamps();
         });
     }
