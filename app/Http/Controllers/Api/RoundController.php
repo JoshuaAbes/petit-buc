@@ -47,10 +47,12 @@ class RoundController extends Controller
             return response()->json(['message' => 'No active round'], 404);
         }
         // Récupère les catégories complètes
-        $categories = \App\Models\Category::whereIn('id', $round->categories)->get();
-        $data = $round->toArray();
-        $data['categories'] = $categories;
-        return response()->json(['data' => $data]);
+    $categories = \App\Models\Category::whereIn('id', $round->categories)->get();
+    $data = $round->toArray();
+    $data['categories'] = $categories;
+    // Numéro du round = position dans la partie
+    $data['number'] = $round->game->rounds()->where('started_at', '<=', $round->started_at)->count();
+    return response()->json(['data' => $data]);
     }
     /**
      * Display a listing of the resource.
