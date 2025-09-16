@@ -14,6 +14,14 @@ class RoundController extends Controller
         // Générer une lettre aléatoire A-Z
         $letter = chr(rand(65, 90));
 
+        // Vérifier qu'il y a au moins 6 catégories
+        $totalCategories = \App\Models\Category::count();
+        if ($totalCategories < 6) {
+            return response()->json([
+                'message' => 'Pas assez de catégories pour démarrer une manche.'
+            ], 400);
+        }
+
         // Tirer 6 catégories aléatoires
         $categories = \App\Models\Category::inRandomOrder()->limit(6)->pluck('name')->toArray();
 
@@ -21,7 +29,7 @@ class RoundController extends Controller
             'game_id' => $game->id,
             'letter' => $letter,
             'categories' => $categories,
-            'status' => 'active',
+            'status' => 'running',
             'started_at' => now(),
         ]);
 
@@ -34,7 +42,7 @@ class RoundController extends Controller
     // Retourne le round actif d'une partie
     public function current(Game $game)
     {
-        $round = $game->rounds()->where('status', 'active')->latest('started_at')->first();
+    $round = $game->rounds()->where('status', 'running')->latest('started_at')->first();
         if (!$round) {
             return response()->json(['message' => 'No active round'], 404);
         }
@@ -78,5 +86,20 @@ class RoundController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    // Valide toutes les réponses d'une manche
+    public function validateAnswers(Game $game, Round $round)
+    {
+        // On valide toutes les réponses du round
+        $count = $round->answers()->update(['is_valid' => true]);
+        // On peut aussi finir la manche
+        $round->status = 'finished';
+        $round->ended_at = now();
+        $round->save();
+        return response()->json([
+            'message' => "Réponses validées et manche terminée",
+            'answers_validated' => $count,
+        ]);
     }
 }

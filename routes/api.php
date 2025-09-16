@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ScoreboardController;
 Route::prefix('v1')->group(function () {
     // Games
     Route::apiResource('games', GameController::class);
-    Route::post('games/{game}/join', [GameController::class, 'join']);
+    Route::post('games/{game}/players', [GameController::class, 'join']);
     Route::get('games/{game}/players', [GameController::class, 'players']);
 
     // Rounds

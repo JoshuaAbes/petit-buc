@@ -28,7 +28,9 @@ class ScoreboardController extends Controller
     {
         $game = \App\Models\Game::with(['players', 'rounds.answers'])->findOrFail($gameId);
         $scores = [];
-        foreach ($game->players as $player) {
+        // Regrouper les joueurs par id pour éviter les doublons
+        $uniquePlayers = $game->players->unique('id');
+        foreach ($uniquePlayers as $player) {
             $scores[$player->id] = [
                 'player' => $player->name,
                 'score' => 0,
@@ -37,9 +39,8 @@ class ScoreboardController extends Controller
 
         // Pour chaque round de la partie
         foreach ($game->rounds as $round) {
-            // Pour chaque catégorie du round
-            $categories = (array) $round->categories;
-            foreach ($categories as $catName) {
+            // Pour chaque catégorie du round (cast auto)
+            foreach ($round->categories as $catName) {
                 // Récupérer les réponses valides pour cette catégorie
                 $answers = $round->answers->filter(function($a) use ($catName) {
                     return $a->is_valid && $a->category && $a->category->name === $catName;

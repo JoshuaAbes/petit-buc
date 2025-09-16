@@ -50,11 +50,11 @@ class GameController extends Controller
     public function join(Request $request, Game $game)
     {
         $validated = $request->validate([
-            'player' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         $player = $game->players()->create([
-            'name'      => $validated['player'],
+            'name'      => $validated['name'],
             'user_id'   => optional(\Illuminate\Support\Facades\Auth::user())->id, // optionnel
             'joined_at' => now(),
         ]);
