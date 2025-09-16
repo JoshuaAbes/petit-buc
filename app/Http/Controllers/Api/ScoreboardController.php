@@ -23,12 +23,40 @@ class ScoreboardController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // GET /api/v1/games/{game}/scoreboard
+    public function show($gameId)
     {
-        //
+        $game = \App\Models\Game::with(['players', 'rounds.answers'])->findOrFail($gameId);
+        $scores = [];
+        foreach ($game->players as $player) {
+            $scores[$player->id] = [
+                'player' => $player->name,
+                'score' => 0,
+            ];
+        }
+
+        // Pour chaque round de la partie
+        foreach ($game->rounds as $round) {
+            // Pour chaque catégorie du round
+            $categories = (array) $round->categories;
+            foreach ($categories as $catName) {
+                // Récupérer les réponses valides pour cette catégorie
+                $answers = $round->answers->filter(function($a) use ($catName) {
+                    return $a->is_valid && $a->category && $a->category->name === $catName;
+                });
+                // Compter les doublons
+                $grouped = $answers->groupBy('answer');
+                foreach ($grouped as $sameAnswers) {
+                    if ($sameAnswers->count() === 1) {
+                        $answer = $sameAnswers->first();
+                        $scores[$answer->player_id]['score']++;
+                    }
+                    // Si plusieurs joueurs ont le même mot, personne ne marque de point
+                }
+            }
+        }
+        // Retourne le scoreboard
+        return response()->json(array_values($scores));
     }
 
     /**

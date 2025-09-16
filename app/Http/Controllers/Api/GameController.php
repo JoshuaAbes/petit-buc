@@ -8,6 +8,11 @@ use App\Models\Game;
 
 class GameController extends Controller
 {
+    // GET /api/v1/games/{game}/players
+    public function players(Game $game)
+    {
+        return response()->json(['data' => $game->players]);
+    }
     // GET /api/v1/games
     public function index()
     {

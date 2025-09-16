@@ -10,6 +10,7 @@ Route::prefix('v1')->group(function () {
     // Games
     Route::apiResource('games', GameController::class);
     Route::post('games/{game}/join', [GameController::class, 'join']);
+    Route::get('games/{game}/players', [GameController::class, 'players']);
 
     // Rounds
     Route::post('games/{game}/rounds/start', [RoundController::class, 'start']);
