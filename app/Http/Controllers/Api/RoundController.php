@@ -46,7 +46,11 @@ class RoundController extends Controller
         if (!$round) {
             return response()->json(['message' => 'No active round'], 404);
         }
-        return response()->json($round);
+        // Récupère les catégories complètes
+        $categories = \App\Models\Category::whereIn('id', $round->categories)->get();
+        $data = $round->toArray();
+        $data['categories'] = $categories;
+        return response()->json(['data' => $data]);
     }
     /**
      * Display a listing of the resource.

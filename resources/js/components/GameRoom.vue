@@ -17,8 +17,12 @@
       <button @click="startRound" :disabled="startingRound || !game">Démarrer</button>
       <div v-if="startingRound">Démarrage du round...</div>
       <div v-if="round">
-        <h4>Round courant: {{ round.id }}</h4>
-        <div>Catégorie: {{ round.category_id }}</div>
+        <h2>Lettre {{ round.letter }} | Round {{ round.number }}</h2>
+        <ol>
+          <li v-for="(cat, idx) in round.categories" :key="cat.id">
+            {{ idx + 1 }}. {{ cat.name }}
+          </li>
+        </ol>
       </div>
       <Scoreboard :gameId="game.id" />
     </div>
