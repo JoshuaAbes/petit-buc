@@ -70,4 +70,39 @@ class RoundController extends Controller
             'answers_validated' => $count,
         ]);
     }
+
+    // Récapitulatif des réponses par catégorie et joueur
+    public function recap(Game $game, Round $round)
+    {
+        if ($round->status !== 'finished') {
+            return response()->json(['message' => 'La manche n\'est pas terminée'], 400);
+        }
+        // Récupère les catégories de la manche
+        $categories = \App\Models\Category::whereIn('id', $round->categories)->get();
+        // Récupère tous les joueurs de la partie
+        $players = $game->players()->get();
+        // Récupère toutes les réponses de la manche
+        $answers = $round->answers()->get();
+
+        // Structure : [catégorie][joueur] = réponse
+        $recap = [];
+        foreach ($categories as $category) {
+            $catRecap = [];
+            foreach ($players as $player) {
+                $answer = $answers->where('category_id', $category->id)->where('player_id', $player->id)->first();
+                $catRecap[] = [
+                    'player' => $player->name,
+                    'answer' => $answer ? $answer->answer : null,
+                ];
+            }
+            $recap[] = [
+                'category' => $category->name,
+                'players' => $catRecap,
+            ];
+        }
+        return response()->json([
+            'letter' => $round->letter,
+            'categories' => $recap,
+        ]);
+    }
 }

@@ -16,6 +16,7 @@ Route::prefix('v1')->group(function () {
     Route::post('games/{game}/rounds/start', [RoundController::class, 'start']);
     Route::get('games/{game}/rounds/current', [RoundController::class, 'current']);
     Route::post('games/{game}/rounds/{round}/validate', [RoundController::class, 'validateAnswers']);
+    Route::get('games/{game}/rounds/{round}/recap', [RoundController::class, 'recap']);
 
     // Answers
     Route::post('games/{game}/rounds/{round}/answers', [AnswerController::class, 'store']);
