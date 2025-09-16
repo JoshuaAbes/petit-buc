@@ -41,7 +41,10 @@ async function joinGame() {
       },
       body: JSON.stringify({ name: playerName.value }),
     });
-    if (!response.ok) throw new Error('API error');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'API error');
+    }
     success.value = true;
     playerName.value = '';
     gameCode.value = '';

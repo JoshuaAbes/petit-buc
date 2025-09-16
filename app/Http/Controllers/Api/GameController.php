@@ -53,6 +53,13 @@ class GameController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
+        // Vérifie l'unicité du nom dans la partie
+        if ($game->players()->where('name', $validated['name'])->exists()) {
+            return response()->json([
+                'message' => 'Ce nom de joueur existe déjà dans cette partie.'
+            ], 422);
+        }
+
         $player = $game->players()->create([
             'name'      => $validated['name'],
             'user_id'   => optional(\Illuminate\Support\Facades\Auth::user())->id, // optionnel

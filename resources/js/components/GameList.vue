@@ -4,6 +4,9 @@
     <ul>
       <li v-for="game in games" :key="game.id">
         Partie code: {{ game.code }} (ID: {{ game.id }})
+        <router-link :to="`/game/${game.id}`">
+          <button>Voir la salle</button>
+        </router-link>
       </li>
     </ul>
     <div v-if="loading">Chargement...</div>
