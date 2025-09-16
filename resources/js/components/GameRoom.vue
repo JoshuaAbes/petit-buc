@@ -14,6 +14,8 @@
       <ul>
         <li v-for="player in players" :key="player.id">{{ player.name }}</li>
       </ul>
+      <button @click="startRound" :disabled="startingRound || !game">Démarrer</button>
+      <div v-if="startingRound">Démarrage du round...</div>
       <div v-if="round">
         <h4>Round courant: {{ round.id }}</h4>
         <div>Catégorie: {{ round.category_id }}</div>
@@ -32,6 +34,31 @@ const players = ref([]);
 const round = ref(null);
 const loading = ref(false);
 const error = ref('');
+const startingRound = ref(false);
+async function startRound() {
+  if (!game.value) return;
+  startingRound.value = true;
+  try {
+    const response = await fetch(`/api/v1/games/${game.value.id}/rounds/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error('Erreur lors du démarrage du round');
+    // Recharge le round courant
+    const resRound = await fetch(`/api/v1/games/${game.value.id}/rounds/current`);
+    if (resRound.ok) {
+      const dataRound = await resRound.json();
+      round.value = dataRound.data || null;
+    }
+  } catch (e) {
+    error.value = e.message;
+  } finally {
+    startingRound.value = false;
+  }
+}
 
 async function fetchGame() {
   loading.value = true;
