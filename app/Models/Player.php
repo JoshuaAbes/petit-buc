@@ -6,18 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
-    protected $fillable = [
-        'game_id', 'user_id', 'name', 'joined_at'
-    ];
-
-    protected $casts = [
-        'joined_at' => 'datetime',
-    ];
+    protected $fillable = ['game_id', 'user_id', 'name', 'joined_at'];
+    protected $casts = ['joined_at' => 'datetime'];
 
     public function game()
     {
-        return $this->belongsTo(Game::class);
+        return $this->belongsTo(\App\Models\Game::class);
     }
+
 
     public function user()
     {

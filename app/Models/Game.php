@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Game extends Model
 {
-    protected $fillable = [
-        'code', 'admin_id', 'status'
-    ];
+    protected $fillable = ['name','max_players','status','code','admin_id'];
 
     public function admin()
     {
@@ -22,6 +20,6 @@ class Game extends Model
 
     public function players()
     {
-        return $this->hasMany(Player::class);
+        return $this->hasMany(\App\Models\Player::class);
     }
 }
