@@ -19,6 +19,8 @@ Route::prefix('v1')->group(function () {
 
     // Answers
     Route::post('games/{game}/rounds/{round}/answers', [AnswerController::class, 'store']);
+    Route::get('games/{game}/rounds/{round}/answers', [AnswerController::class, 'index']);
+    Route::patch('games/{game}/rounds/{round}/answers/{answer}', [AnswerController::class, 'update']);
 
     // Scoreboard
     Route::get('games/{game}/scoreboard', [ScoreboardController::class, 'show']);
