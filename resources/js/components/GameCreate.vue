@@ -14,12 +14,14 @@
 </template>
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const name = ref('');
 const loading = ref(false);
 const error = ref('');
 const success = ref(false);
 const gameCode = ref('');
+const router = useRouter();
 
 async function createGame() {
   loading.value = true;
@@ -39,6 +41,8 @@ async function createGame() {
     gameCode.value = data.data.code;
     success.value = true;
     name.value = '';
+    // Redirection directe vers la salle de jeu créée
+    router.push(`/game/${data.data.id}`);
   } catch (e) {
     error.value = e.message;
   } finally {
