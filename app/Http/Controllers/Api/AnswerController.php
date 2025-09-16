@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class AnswerController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Affiche la liste des réponses d'un round (avec joueur et catégorie).
      */
     public function index($gameId, $roundId)
     {
@@ -25,18 +25,16 @@ class AnswerController extends Controller
      */
     public function store(Request $request, $gameId, $roundId)
     {
-    $data = json_decode($request->getContent(), true) ?? [];
-        Log::info('Requête reçue pour store Answer', [
-            'data' => $data,
-            'raw' => $request->getContent(),
-        ]);
-
-    $validated = Validator::make($data, [
+        // Récupère les données JSON envoyées
+        $data = json_decode($request->getContent(), true) ?? [];
+        // Valide les champs obligatoires
+        $validated = Validator::make($data, [
             'player_id' => 'required|exists:players,id',
             'category_id' => 'required|exists:categories,id',
             'answer' => 'required|string|max:255',
         ])->validate();
 
+        // Crée la réponse en base, non validée par défaut
         $answer = \App\Models\Answer::create([
             'round_id' => $roundId,
             'player_id' => $validated['player_id'],
@@ -45,6 +43,7 @@ class AnswerController extends Controller
             'is_valid' => false, // à valider plus tard
         ]);
 
+        // Retourne la réponse créée
         return response()->json($answer, 201);
     }
 
@@ -62,17 +61,21 @@ class AnswerController extends Controller
      */
     public function update(Request $request, $gameId, $roundId, $answerId)
     {
+        // Valide le champ is_valid envoyé
         $validated = $request->validate([
             'is_valid' => 'required|boolean',
         ]);
 
+        // Récupère la réponse à mettre à jour
         $answer = \App\Models\Answer::where('id', $answerId)
             ->where('round_id', $roundId)
             ->firstOrFail();
 
+        // Met à jour la validation de la réponse
         $answer->is_valid = $validated['is_valid'];
         $answer->save();
 
+        // Retourne la réponse modifiée
         return response()->json($answer);
     }
 

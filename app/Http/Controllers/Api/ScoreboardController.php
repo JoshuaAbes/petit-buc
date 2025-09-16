@@ -26,8 +26,10 @@ class ScoreboardController extends Controller
     // GET /api/v1/games/{game}/scoreboard
     public function show($gameId)
     {
+        // Récupère le jeu avec ses joueurs et les réponses de chaque manche
         $game = \App\Models\Game::with(['players', 'rounds.answers'])->findOrFail($gameId);
         $scores = [];
+        // Initialise le score de chaque joueur à 0
         $uniquePlayers = $game->players->unique('id');
         foreach ($uniquePlayers as $player) {
             $scores[$player->id] = [
@@ -36,14 +38,17 @@ class ScoreboardController extends Controller
             ];
         }
 
+        // Parcourt chaque manche du jeu
         foreach ($game->rounds as $round) {
-            // Pour chaque réponse validée du round (is_valid truthy)
+            // Pour chaque réponse validée de la manche, ajoute 1 point au joueur
             foreach ($round->answers as $answer) {
+                // Si la réponse est validée par le maître du jeu
                 if ($answer->is_valid && isset($scores[$answer->player_id])) {
                     $scores[$answer->player_id]['score']++;
                 }
             }
         }
+        // Retourne le scoreboard sous forme de tableau
         return response()->json(array_values($scores));
     }
 
