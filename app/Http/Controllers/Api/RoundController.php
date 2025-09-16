@@ -22,8 +22,8 @@ class RoundController extends Controller
             ], 400);
         }
 
-        // Tirer 6 catégories aléatoires
-        $categories = \App\Models\Category::inRandomOrder()->limit(6)->pluck('name')->toArray();
+        // Tirer 6 catégories aléatoires (on stocke les ids)
+        $categories = \App\Models\Category::inRandomOrder()->limit(6)->pluck('id')->toArray();
 
         $round = Round::create([
             'game_id' => $game->id,

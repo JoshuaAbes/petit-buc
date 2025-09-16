@@ -28,7 +28,6 @@ class ScoreboardController extends Controller
     {
         $game = \App\Models\Game::with(['players', 'rounds.answers'])->findOrFail($gameId);
         $scores = [];
-        // Regrouper les joueurs par id pour éviter les doublons
         $uniquePlayers = $game->players->unique('id');
         foreach ($uniquePlayers as $player) {
             $scores[$player->id] = [
@@ -37,26 +36,14 @@ class ScoreboardController extends Controller
             ];
         }
 
-        // Pour chaque round de la partie
         foreach ($game->rounds as $round) {
-            // Pour chaque catégorie du round (cast auto)
-            foreach ($round->categories as $catName) {
-                // Récupérer les réponses valides pour cette catégorie
-                $answers = $round->answers->filter(function($a) use ($catName) {
-                    return $a->is_valid && $a->category && $a->category->name === $catName;
-                });
-                // Compter les doublons
-                $grouped = $answers->groupBy('answer');
-                foreach ($grouped as $sameAnswers) {
-                    if ($sameAnswers->count() === 1) {
-                        $answer = $sameAnswers->first();
-                        $scores[$answer->player_id]['score']++;
-                    }
-                    // Si plusieurs joueurs ont le même mot, personne ne marque de point
+            // Pour chaque réponse validée du round (is_valid truthy)
+            foreach ($round->answers as $answer) {
+                if ($answer->is_valid && isset($scores[$answer->player_id])) {
+                    $scores[$answer->player_id]['score']++;
                 }
             }
         }
-        // Retourne le scoreboard
         return response()->json(array_values($scores));
     }
 

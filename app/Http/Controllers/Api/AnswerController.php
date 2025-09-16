@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AnswerController extends Controller
 {
@@ -23,11 +25,17 @@ class AnswerController extends Controller
      */
     public function store(Request $request, $gameId, $roundId)
     {
-        $validated = $request->validate([
+    $data = json_decode($request->getContent(), true) ?? [];
+        Log::info('Requête reçue pour store Answer', [
+            'data' => $data,
+            'raw' => $request->getContent(),
+        ]);
+
+    $validated = Validator::make($data, [
             'player_id' => 'required|exists:players,id',
             'category_id' => 'required|exists:categories,id',
             'answer' => 'required|string|max:255',
-        ]);
+        ])->validate();
 
         $answer = \App\Models\Answer::create([
             'round_id' => $roundId,
